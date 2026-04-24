@@ -7,5 +7,5 @@ Data will be logged for trip summaries and derived metrics like
 - throttle rate
 - battery health
 - trip summary
-In addition the system can include optional controls: a relay- driven door lock actuator and a blue tooth baxed proximity dection that can auto unlock when the user approaches.
+- etc
 
