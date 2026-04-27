@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <string>
+#include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <termios.h>
 
 struct one{
     bool OVERDIVE;
@@ -147,16 +150,45 @@ int main(){
 		fprintf(stderr, "\nError opened file\n");
 		exit(-1);
 	}
+	//read until first white space
+	
+	int serial_port = open("/dev/ttyACM0", O_RDWR);
+
+	if(serial_port < 0){
+		perror("error opening serial port");
+		return 1;
+	}
+
+	struct termios tty;
+
+	togetattr(serial_port, &tty);
+	cfsetispeed(&tty, B9600);
+	cfsetopseed(&tty, B9600);
+	tty.c_cflag |= (CLOCAL | CREAD);
+	tty.c_cflag &= ~PARENB; // No parity    
+	tty.c_cflag &= ~CSTOPB; // 1 stop bit    
+	tty.c_cflag &= ~CSIZE;   // Clear the current char size mask    
+	tty.c_cflag |= CS8;      // 8 data bits    
+	tcsetattr(serial_port, TCSANOW, &tty);
+
+	char read_buf[256];
+	while(1){
+		int num_bytes = read(serial_port, read_buf, sizeof(read_buf));
+		if (num_bytes > 0){
+			read_buf[num_bytes]='\0';
+		}
+	}
+	close(serial_port);
 
 
 	fclose(out);
-
+	return 0;
 }
 
 char* handle_one(char* byte[8]){
 
 	if(byte[0] == 1){
-
+		
 	}
 
 }
