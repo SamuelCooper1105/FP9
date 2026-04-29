@@ -6,7 +6,7 @@
 #include <termios.h>
 
 struct one{
-    bool OVERDIVE;
+    bool OVERDRIVE;
     bool MALF;
     bool ref_pulse;
     bool ALDL_mode;
@@ -16,11 +16,11 @@ struct one{
     bool shigt_light;
 };
 struct two{
-    char* PROMID_ONE[8];
+    char* PROMID_ONE[9];
 
 };
 struct three{
-    char* PROMID_TWO[8];
+    char* PROMID_TWO[9];
 };
 
 struct four{
@@ -43,7 +43,7 @@ struct eight{
 };
 
 struct nine{
-    int THROTTLE_POS:
+    int THROTTLE_POS;
 };
 
 struct ten{
@@ -127,23 +127,22 @@ struct twentyone{
     int ALDL_CHANGE_COUNTER;
 };
 struct twentytwo{
-    char *AFR_MSB[8];
+    char *AFR_MSB[9];
 };
 struct twentythree{
-    char *AFR_LSB[8];
+    char *AFR_LSB[9];
 };
 struct twentyfour{
-    char *MSB_IBPW[8];
+    char *MSB_IBPW[9];
 };
 struct twentyfive{
-    char *LSB_IBPW[8];
+    char *LSB_IBPW[9];
 };
 
 int main(){
 
 	//values will be input as a stream of bytes
 	//These bytes will need to be converted into binary
-	char* map[16] ={"0000","0001","0010","0011","0100","0101","0110","0111","1000","1001","1010","1011","1100","1101","1110","1111"};
 	FILE *out;
 	out=fopen("output.txt", "w")
 	if(out == NULL){
@@ -161,9 +160,9 @@ int main(){
 
 	struct termios tty;
 
-	togetattr(serial_port, &tty);
+	tcgetattr(serial_port, &tty);
 	cfsetispeed(&tty, B115200);
-	cfsetopseed(&tty, B115200);
+	cfsetospeed(&tty, B115200);
 	tty.c_cflag |= (CLOCAL | CREAD);
 	tty.c_cflag &= ~PARENB; // No parity
 	tty.c_cflag &= ~CSTOPB; // 1 stop bit
@@ -171,7 +170,7 @@ int main(){
 	tty.c_cflag |= CS8;      // 8 data bits
 	tcsetattr(serial_port, TCSANOW, &tty);
 
-	char read_buf[256];
+	char read_buf[128];
 	while(1){
 		int num_bytes = read(serial_port, read_buf, sizeof(read_buf));
 		if (num_bytes > 0){
@@ -183,21 +182,135 @@ int main(){
 	one[0] = read_buf[0];
 	one[1] = read_buf[1];
 	one[2] = '\0';
+	char one_d[9];
+	translate(one,one_d);
+	struct one *one = handle_one(one_d);
 	char two[3];
 	two[0] = read_buf[3];
 	two[1] = read_buf[4];
 	two[2] = '\0';
-
-
+	char three[3];
+	three[0] = read_buf[6];
+	three[1] = read_buf[7];
+	three[2] = '\0';
+	char four[3];
+	four[0] = read_buf[9];
+	four[1] = read_buf[10];
+	four[2] = '\0';
+	char five[3];
+	five[0] = read_buf[12];
+	five[1] = read_buf[13];
+	five[2] = '\0';
+	char six[3];
+	six[0] = read_buf[15];
+	six[1] = read_buf[16];
+	six[2] = '\0';
+	char seven[3];
+	seven[0] = read_buf[18];
+	seven[1] = read_buf[19];
+	seven[2] = '\0';
+	char eight[3];
+	eight[0] = read_buf[21];
+	eight[1] = read_buf[22];
+	eight[2] = '\0';
+	char nine[3];
+	nine[0] = read_buf[24];
+	nine[1] = read_buf[25];
+	nine[2] = '\0';
+	char ten[3];
+	ten[0] = read_buf[27];
+	ten[1] = read_buf[28];
+	ten[2] = '\0';
+	char eleven[3];
+	eleven[0] = read_buf[30];
+	eleven[1] = read_buf[31];
+	eleven[2] = '\0';
+	char twelve[3];
+	twelve[0] = read_buf[33];
+	twelve[1] = read_buf[34];
+	twelve[2] = '\0';
+	char thirteen[3];
+	thirteen[0] = read_buf[36];
+	thirteen[1] = read_buf[37];
+	thirteen[2] = '\0';
+	char fourteen[3];
+	fourteen[0] = read_buf[39];
+	fourteen[1] = read_buf[40];
+	fourteen[2] = '\0';
+	char fifteen[3];
+	fifteen[0] = read_buf[42];
+	fifteen[1] = read_buf[43];
+	fifteen[2] = '\0';
+	char sixteen[3];
+	sixteen[0] = read_buf[45];
+	sixteen[1] = read_buf[46];
+	sixteen[2] = '\0';
+	char seventeen[3];
+	seventeen[0] = read_buf[48];
+	seventeen[1] = read_buf[49];
+	seventeen[2] = '\0';
+	char eighteen[3];
+	eighteen[0] = read_buf[51];
+	eighteen[1] = read_buf[52];
+	eighteen[2] = '\0';
+	char nineteen[3];
+	nineteen[0] = read_buf[54];
+	nineteen[1] = read_buf[55];
+	nineteen[2] = '\0';
+	char twenty[3];
+	twenty[0] = read_buf[57];
+	twenty[1] = read_buf[58];
+	twenty[2] = '\0';
+	char twentyone[3];
+	twentyone[0] = read_buf[60];
+	twentyone[1] = read_buf[61];
+	twentyone[2] = '\0';
+	char twentytwo[3];
+	twentytwo[0] = read_buf[63];
+	twentytwo[1] = read_buf[64];
+	twentytwo[2] = '\0';
+	char twentythree[3];
+	twentythree[0] = read_buf[66];
+	twentythree[1] = read_buf[67];
+	twentythree[2] = '\0';
+	char twentyfour[3];
+	twentyfour[0] = read_buf[69];
+	twentyfour[1] = read_buf[70];
+	twentyfour[2] = '\0';
+	char twentyfive[3];
+	twentyfive[0] = read_buf[72];
+	twentyfive[1] = read_buf[73];
+	twentyfive[2] = '\0';
 
 	close(serial_port);
 	fclose(out);
 	return 0;
 }
 
+void translate(char hex[3], char res[9]) {
+    char* map[16] = {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"};
+    char MSB[5];
+    int im;
+    int il;
+    if(hex[0] >= '0' && hex[0] <= '9'){
+        im = hex[0] - '0';
+
+    }
+    else if(hex[0] >= 'A' && hex[0] <= 'F'){
+        im = hex[0] - 'A'+10;
+    }
+    if(hex[1] >= '0' && hex[1] <='9'){
+        il = hex[1] - '0';
+    }
+    else if(hex[1] >= 'A' && hex[1] <= 'F'){
+        il = hex[1] - 'A' +10;
+    }
+    strcpy(res,map[im]);
+    strcat(res,map[il]);
+
+}
+
 struct one *handle_one(char byte[9]){
-
-
     struct one *one = malloc(sizeof(struct one));
 
 	if(byte[0] == '1'){
@@ -260,12 +373,12 @@ struct one *handle_one(char byte[9]){
 }
 struct two *handle_two(char byte[9]){
 	struct two *two = malloc(sizeof(struct two));
-	two->PROMID_ONE = byte;
+	strcpy(two->PROMID_ONE, byte);
 	return two;
 }
 struct three *handle_three(char byte[9]){
 	struct three *three = malloc(sizeof(struct three));
-	three->PROMID_TWO = byte;
+	strcpy(three->PROMID_TWO, byte);
 	return three;
 }
 struct four *handle_four(char byte[9]){
@@ -719,24 +832,24 @@ struct twentyone *handle_twentyone(char byte[9]) {
 
 struct twentytwo *handle_twentytwo(char byte[9]) {
     struct twentytwo *twentytwo = malloc(sizeof(struct twentytwo));
-    twentytwo->AFR_MSB[9]=byte;
+    strcpy(twentytwo->AFR_MSB[9], byte);
     return twentytwo;
 }
 
 struct twentythree *handle_twentythree(char byte[9]) {
     struct twentythree *twentythree = malloc(sizeof(struct twentythree));
-    twentythree->AFR_LSB[9]=byte;
+    strcpy(twentythree->AFR_LSB[9], byte);
     return twentythree;
 }
 
 struct twentyfour *handle_twentyfour(char byte[9]) {
     struct twentyfour *twentyfour = malloc(sizeof(struct twentyfour));
-    twentyfour->AFR_MSB[9]=byte;
+    strcpy(twentyfour->MSB_IBPW[9], byte);
     return twentyfour;
 }
 
 struct twentyfive *handle_twentyfive(char byte[9]) {
     struct twentyfive *twentyfive = malloc(sizeof(struct twentyfive));
-    twentyfive->AFR_LSB[9]=byte;
+    strcpy(twentyfive->LSB_IBPW[9], byte);
     return twentyfive;
 }
