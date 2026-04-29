@@ -142,15 +142,14 @@ struct twentyfive{
 int main(){
 
 	//values will be input as a stream of bytes
-	//These bytes will need to be converted into binary
+	//output file for decoded values
 	FILE *out;
-	out=fopen("output.txt", "w")
+	out=fopen("output.txt", "w");
 	if(out == NULL){
 		fprintf(stderr, "\nError opened file\n");
 		exit(-1);
 	}
-	//read until first white space
-
+	//open serial port
 	int serial_port = open("/dev/ttyACM0", O_RDWR);
 
 	if(serial_port < 0){
@@ -198,22 +197,47 @@ int main(){
 	two[0] = read_buf[3];
 	two[1] = read_buf[4];
 	two[2] = '\0';
+	char two_d[9];
+	translate(two, two_d);
+	struct two *two = handle_two(two_d);
+	fprintf(out, "PROMID_ONE: %s\n", two->PROMID_ONE);
+	free(two);
 	char three[3];
 	three[0] = read_buf[6];
 	three[1] = read_buf[7];
 	three[2] = '\0';
+	char three_d[9];
+	translate(three,three_d);
+	struct three *three = handle_three(three_d);
+	fprintf(out,"PROMID_TWO: %s\n", three->PROMID_TWO);
+	free(three);
 	char four[3];
 	four[0] = read_buf[9];
 	four[1] = read_buf[10];
 	four[2] = '\0';
+	char four_d[9];
+	translate(four,four_d);
+	struct four *four = handle_four(four_d);
+	fprintf(out,"step_count: %d\n",four->step_count);
+	free(four);
 	char five[3];
 	five[0] = read_buf[12];
 	five[1] = read_buf[13];
 	five[2] = '\0';
+	char five_d[9];
+	translate(five,five_d);
+	struct five *five = handle_five(five_d);
+	fprintf(out,"COOLANT_TEMP: %d\n", five->COOLANT_TEMP);
+	free(five);
 	char six[3];
 	six[0] = read_buf[15];
 	six[1] = read_buf[16];
 	six[2] = '\0';
+	char six_d[9];
+	translate(six,six_d);
+	struct six *six = handle_six(six_d);
+	fprintf(out,"MPH: %d\n", six->MPH);
+	free(six);
 	char seven[3];
 	seven[0] = read_buf[18];
 	seven[1] = read_buf[19];
@@ -321,7 +345,10 @@ void translate(char hex[3], char res[9]) {
 
 struct one *handle_one(char byte[9]){
     struct one *one = malloc(sizeof(struct one));
-
+    if(one==NULL){
+        fprintf(stderr,"%s: could not allocate memory for one; %s\n", "one", strerror(errno));
+        exit(-1);
+    }
 	if(byte[0] == '1'){
 	    one->OVERDRIVE = 1;
 	}
@@ -383,16 +410,28 @@ struct one *handle_one(char byte[9]){
 }
 struct two *handle_two(char byte[9]){
 	struct two *two = malloc(sizeof(struct two));
+    if(two==NULL){
+        fprintf(stderr,"%s: could not allocate memory for two; %s\n", "two", strerror(errno));
+        exit(-1);
+    }
 	strcpy(two->PROMID_ONE, byte);
 	return two;
 }
 struct three *handle_three(char byte[9]){
 	struct three *three = malloc(sizeof(struct three));
+    if(three==NULL){
+        fprintf(stderr,"%s: could not allocate memory for three; %s\n", "three", strerror(errno));
+        exit(-1);
+    }
 	strcpy(three->PROMID_TWO, byte);
 	return three;
 }
 struct four *handle_four(char byte[9]){
     struct four *four = malloc(sizeof(struct four));
+    if(four==NULL){
+        fprintf(stderr,"%s: could not allocate memory for four; %s\n", "four", strerror(errno));
+        exit(-1);
+    }
     int step =0;
     for(int i =0, ;i<8;i++){
         if(byte[i]=='1'){
@@ -404,6 +443,10 @@ struct four *handle_four(char byte[9]){
 }
 struct five *handle_five(char byte[9]){
     struct five *five = malloc(sizeof(struct five));
+    if(five==NULL){
+        fprintf(stderr,"%s: could not allocate memory for five; %s\n", "five", strerror(errno));
+        exit(-1);
+    }
     int temp=0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
@@ -417,6 +460,10 @@ struct five *handle_five(char byte[9]){
 }
 struct six *handle_six(char byte[9]){
     struct six *six = malloc(sizeof(struct six));
+    if(six==NULL){
+        fprintf(stderr,"%s: could not allocate memory for six; %s\n", "six", strerror(errno));
+        exit(-1);
+    }
     int MPH =0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
@@ -428,6 +475,10 @@ struct six *handle_six(char byte[9]){
 }
 struct seven *handle_seven(char byte[9]){
     struct seven *seven = malloc(sizeof(struct seven));
+    if(seven==NULL){
+        fprintf(stderr,"%s: could not allocate memory for seven; %s\n", "seven", strerror(errno));
+        exit(-1);
+    }
     int EGR_duty_cycle = 0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
@@ -440,6 +491,10 @@ struct seven *handle_seven(char byte[9]){
 }
 struct eight *handle_eight(char byte[9]){
     struct eight *eight = malloc(sizeof(struct eight));
+    if(eight==NULL){
+        fprintf(stderr,"%s: could not allocate memory for eight; %s\n", "eight", strerror(errno));
+        exit(-1);
+    }
     int RPM = 0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
@@ -452,6 +507,10 @@ struct eight *handle_eight(char byte[9]){
 }
 struct nine *handle_nine(char byte[9]) {
     struct nine *nine = malloc(sizeof(struct nine));
+    if(nine==NULL){
+        fprintf(stderr,"%s: could not allocate memory for nine; %s\n", "nine", strerror(errno));
+        exit(-1);
+    }
     int TP = 0;
     for(int i =0;i<8;++i){
         if(byte[i] == '1'){
@@ -464,6 +523,10 @@ struct nine *handle_nine(char byte[9]) {
 }
 struct ten *handle_ten(char byte[9]){
     struct ten *ten = malloc(sizeof(struct ten));
+    if(ten==NULL){
+        fprintf(stderr,"%s: could not allocate memory for ten; %s\n", "ten", strerror(errno));
+        exit(-1);
+    }
     int BP = 0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
@@ -476,6 +539,10 @@ struct ten *handle_ten(char byte[9]){
 }
 struct eleven *handle_eleven(char byte[9]){
     struct eleven *eleven = malloc(sizeof(struct eleven));
+    if(eleven==NULL){
+        fprintf(stderr,"%s: could not allocate memory for eleven; %s\n", "eleven", strerror(errno));
+        exit(-1);
+    }
     int OS = 0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
@@ -488,6 +555,10 @@ struct eleven *handle_eleven(char byte[9]){
 }
 struct twelve *handle_twelve(char byte[9]){
     struct twelve *twelve = malloc(sizeof(struct twelve));
+    if(twelve==NULL){
+        fprintf(stderr,"%s: could not allocate memory for twelve; %s\n", "twelve", strerror(errno));
+        exit(-1);
+    }
     if(byte[0] == '1'){
 	    twelve -> MAT_SENS = 1;
 	}
@@ -540,6 +611,10 @@ struct twelve *handle_twelve(char byte[9]){
 }
 struct thirteen *handle_thirteen(char byte[9]){
     struct thirteen *thirteen = malloc(sizeof(struct thirteen));
+    if(thirteen==NULL){
+        fprintf(stderr,"%s: could not allocate memory for thirteen; %s\n", "thirteen", strerror(errno));
+        exit(-1);
+    }
     if(byte[1]=='1'){
         thirteen->C34=1;
     }
@@ -575,6 +650,10 @@ struct thirteen *handle_thirteen(char byte[9]){
 }
 struct fourteen * handle_fourteen(char byte[9]){
     struct fourteen *fourteen = malloc(sizeof(struct fourteen));
+    if(fourteen==NULL){
+        fprintf(stderr,"%s: could not allocate memory for fourteen; %s\n", "fourteen", strerror(errno));
+        exit(-1);
+    }
     if(byte[0]=='1'){
         fourteen->C51=1;
     }
@@ -627,6 +706,10 @@ struct fourteen * handle_fourteen(char byte[9]){
 }
 struct fifteen * handle_fifteen(char byte[9]){
     struct fifteen *fifteen = malloc(sizeof(struct fifteen));
+    if(fifteen==NULL){
+        fprintf(stderr,"%s: could not allocate memory for fifteen; %s\n", "fifteen", strerror(errno));
+        exit(-1);
+    }
     if(byte[4]=='1'){
         fifteen->C54=1;
     }
@@ -655,6 +738,10 @@ struct fifteen * handle_fifteen(char byte[9]){
 }
 struct sixteen * handle_sixteen(char byte[9]){
     struct sixteen *sixteen = malloc(sizeof(struct sixteen));
+    if(sixteen==NULL){
+        fprintf(stderr,"%s: could not allocate memory for sixteen; %s\n", "sixteen", strerror(errno));
+        exit(-1);
+    }
     if(byte[1]=='1'){
         sixteen->LCEF=1;
     }
@@ -689,7 +776,10 @@ struct sixteen * handle_sixteen(char byte[9]){
 }
 struct seventeen *handle_seventeen(char byte[9]) {
     struct seventeen *seventeen = malloc(sizeof(struct seventeen));
-
+    if(seventeen==NULL){
+        fprintf(stderr,"%s: could not allocate memory for seventeen; %s\n", "seventeen", strerror(errno));
+        exit(-1);
+    }
     // Convert binary string to integer
     int raw = (int)strtol(byte, NULL, 2);
 
@@ -750,6 +840,10 @@ struct seventeen *handle_seventeen(char byte[9]) {
 }
 struct eighteen *handle_eighteen(char byte[9]) {
     struct eighteen *eighteen = malloc(sizeof(struct eighteen));
+    if(eighteen==NULL){
+        fprintf(stderr,"%s: could not allocate memory for eighteen; %s\n", "eighteen", strerror(errno));
+        exit(-1);
+    }
     if(byte[0]=='1'){
         eighteen->PARK_NET=1;
     }
@@ -803,6 +897,10 @@ struct eighteen *handle_eighteen(char byte[9]) {
 
 struct nineteen *handle_nineteen(char byte[9]) {
     struct nineteen *nineteen = malloc(sizeof(struct nineteen));
+    if(nineteen==NULL){
+        fprintf(stderr,"%s: could not allocate memory for nineteen; %s\n", "nineteen", strerror(errno));
+        exit(-1);
+    }
     int OLDPA3=0;
     for(int i =0; i<8;++i){
         if(byte[i]=='1'){
@@ -816,6 +914,10 @@ struct nineteen *handle_nineteen(char byte[9]) {
 
 struct twenty *handle_twenty(char byte[9]) {
     struct twenty *twenty = malloc(sizeof(struct twenty));
+    if(twenty==NULL){
+        fprintf(stderr,"%s: could not allocate memory for twenty; %s\n", "twenty", strerror(errno));
+        exit(-1);
+    }
     int BLM=0;
     for(int i =0; i<8;++i){
         if(byte[i]=='1'){
@@ -829,6 +931,10 @@ struct twenty *handle_twenty(char byte[9]) {
 
 struct twentyone *handle_twentyone(char byte[9]) {
     struct twentyone *twentyone = malloc(sizeof(struct twentyone));
+    if(twentyone==NULL){
+        fprintf(stderr,"%s: could not allocate memory for twentyone; %s\n", "twentyone", strerror(errno));
+        exit(-1);
+    }
     int ALDL_CHANGE_COUNTER=0;
     for(int i =0; i<8;++i){
         if(byte[i]=='1'){
@@ -842,24 +948,40 @@ struct twentyone *handle_twentyone(char byte[9]) {
 
 struct twentytwo *handle_twentytwo(char byte[9]) {
     struct twentytwo *twentytwo = malloc(sizeof(struct twentytwo));
+    if(twentytwo==NULL){
+        fprintf(stderr,"%s: could not allocate memory for twentytwo; %s\n", "twentytwo", strerror(errno));
+        exit(-1);
+    }
     strcpy(twentytwo->AFR_MSB[9], byte);
     return twentytwo;
 }
 
 struct twentythree *handle_twentythree(char byte[9]) {
     struct twentythree *twentythree = malloc(sizeof(struct twentythree));
+    if(twentythree==NULL){
+        fprintf(stderr,"%s: could not allocate memory for twentythree; %s\n", "twentythree", strerror(errno));
+        exit(-1);
+    }
     strcpy(twentythree->AFR_LSB[9], byte);
     return twentythree;
 }
 
 struct twentyfour *handle_twentyfour(char byte[9]) {
     struct twentyfour *twentyfour = malloc(sizeof(struct twentyfour));
+    if(twentyfour==NULL){
+        fprintf(stderr,"%s: could not allocate memory for twentyfour; %s\n", "twentyfour", strerror(errno));
+        exit(-1);
+    }
     strcpy(twentyfour->MSB_IBPW[9], byte);
     return twentyfour;
 }
 
 struct twentyfive *handle_twentyfive(char byte[9]) {
     struct twentyfive *twentyfive = malloc(sizeof(struct twentyfive));
+    if(twentyfive==NULL){
+        fprintf(stderr,"%s: could not allocate memory for twentyfive; %s\n", "twentyfive", strerror(errno));
+        exit(-1);
+    }
     strcpy(twentyfive->LSB_IBPW[9], byte);
     return twentyfive;
 }
