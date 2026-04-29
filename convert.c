@@ -185,6 +185,15 @@ int main(){
 	char one_d[9];
 	translate(one,one_d);
 	struct one *one = handle_one(one_d);
+	fprintf(out, "OVERDRIVE: %d\n", one->OVERDRIVE);
+	fprintf(out, "MALF: %d\n", one->MALF);
+	fprintf(out, "ref_pulse: %d\n", one->ref_pulse);
+	fprintf(out, "ALDL_mode: %d\n", one->ALDL_mode);
+	fprintf(out, "dia_pos: %d\n", one->dia_pos);
+	fprintf(out, "aldl_pos: %d\n", one->aldl_pos);
+	fprintf(out, "high_bat_volt: %d\n", one->high_bat_volt);
+	fprintf(out, "shigt_light: %d\n", one->shigt_light);
+	free(one);
 	char two[3];
 	two[0] = read_buf[3];
 	two[1] = read_buf[4];
@@ -369,6 +378,7 @@ struct one *handle_one(char byte[9]){
 	else{
 	    one->shigt_light = 0;
 	}
+
 	return one;
 }
 struct two *handle_two(char byte[9]){
