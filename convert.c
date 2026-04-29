@@ -162,8 +162,8 @@ int main(){
 	struct termios tty;
 
 	togetattr(serial_port, &tty);
-	cfsetispeed(&tty, B9600);
-	cfsetopseed(&tty, B9600);
+	cfsetispeed(&tty, B115200);
+	cfsetopseed(&tty, B115200);
 	tty.c_cflag |= (CLOCAL | CREAD);
 	tty.c_cflag &= ~PARENB; // No parity
 	tty.c_cflag &= ~CSTOPB; // 1 stop bit
@@ -178,14 +178,24 @@ int main(){
 			read_buf[num_bytes]='\0';
 		}
 	}
+
+	char one[3];
+	one[0] = read_buf[0];
+	one[1] = read_buf[1];
+	one[2] = '\0';
+	char two[3];
+	two[0] = read_buf[3];
+	two[1] = read_buf[4];
+	two[2] = '\0';
+
+
+
 	close(serial_port);
-
-
 	fclose(out);
 	return 0;
 }
 
-struct one *handle_one(char byte[8]){
+struct one *handle_one(char byte[9]){
 
 
     struct one *one = malloc(sizeof(struct one));
@@ -248,17 +258,17 @@ struct one *handle_one(char byte[8]){
 	}
 	return one;
 }
-struct two *handle_two(char byte[8]){
+struct two *handle_two(char byte[9]){
 	struct two *two = malloc(sizeof(struct two));
 	two->PROMID_ONE = byte;
 	return two;
 }
-struct three *handle_three(char byte[8]){
+struct three *handle_three(char byte[9]){
 	struct three *three = malloc(sizeof(struct three));
 	three->PROMID_TWO = byte;
 	return three;
 }
-struct four *handle_four(char byte[8]){
+struct four *handle_four(char byte[9]){
     struct four *four = malloc(sizeof(struct four));
     int step =0;
     for(int i =0, ;i<8;i++){
@@ -269,7 +279,7 @@ struct four *handle_four(char byte[8]){
     four->step = step;
     return four;
 }
-struct five *handle_five(char byte[8]){
+struct five *handle_five(char byte[9]){
     struct five *five = malloc(sizeof(struct five));
     int temp=0;
     for(int i = 0; i < 8; i++) {
@@ -282,7 +292,7 @@ struct five *handle_five(char byte[8]){
 
 	return five;
 }
-struct six *handle_six(char byte[8]){
+struct six *handle_six(char byte[9]){
     struct six *six = malloc(sizeof(struct six));
     int MPH =0;
     for(int i = 0; i < 8; i++) {
@@ -293,7 +303,7 @@ struct six *handle_six(char byte[8]){
     six->MPH = MPH;
     return six;
 }
-struct seven *handle_seven(char byte[8]){
+struct seven *handle_seven(char byte[9]){
     struct seven *seven = malloc(sizeof(struct seven));
     int EGR_duty_cycle = 0;
     for(int i = 0; i < 8; i++) {
@@ -305,7 +315,7 @@ struct seven *handle_seven(char byte[8]){
     seven->EGR_duty_cycle = EGR_duty_cycle;
     return seven;
 }
-struct eight *handle_eight(char byte[8]){
+struct eight *handle_eight(char byte[9]){
     struct eight *eight = malloc(sizeof(struct eight));
     int RPM = 0;
     for(int i = 0; i < 8; i++) {
@@ -317,7 +327,7 @@ struct eight *handle_eight(char byte[8]){
     eight->RPM = RPM;
     return eight;
 }
-struct nine *handle_nine(char byte[8]){
+struct nine *handle_nine(char byte[9]) {
     struct nine *nine = malloc(sizeof(struct nine));
     int TP = 0;
     for(int i =0;i<8;++i){
@@ -329,7 +339,7 @@ struct nine *handle_nine(char byte[8]){
     nine->TP = TP;
     return nine;
 }
-struct ten *handle_ten(char byte[8]){
+struct ten *handle_ten(char byte[9]){
     struct ten *ten = malloc(sizeof(struct ten));
     int BP = 0;
     for(int i = 0; i < 8; i++) {
@@ -341,7 +351,7 @@ struct ten *handle_ten(char byte[8]){
     ten->BP = BP;
     return ten;
 }
-struct eleven *handle_eleven(char byte[8]){
+struct eleven *handle_eleven(char byte[9]){
     struct eleven *eleven = malloc(sizeof(struct eleven));
     int OS = 0;
     for(int i = 0; i < 8; i++) {
@@ -353,7 +363,7 @@ struct eleven *handle_eleven(char byte[8]){
     eleven->OS = OS;
     return eleven;
 }
-struct twelve *handle_twelve(char byte[8]){
+struct twelve *handle_twelve(char byte[9]){
     struct twelve *twelve = malloc(sizeof(struct twelve));
     if(byte[0] == '1'){
 	    twelve -> MAT_SENS = 1;
@@ -405,7 +415,7 @@ struct twelve *handle_twelve(char byte[8]){
 	}
 	return twelve;
 }
-struct thirteen *handle_thirteen(char byte[8]){
+struct thirteen *handle_thirteen(char byte[9]){
     struct thirteen *thirteen = malloc(sizeof(struct thirteen));
     if(byte[1]=='1'){
         thirteen->C34=1;
@@ -440,7 +450,7 @@ struct thirteen *handle_thirteen(char byte[8]){
     }
     return thirteen;
 }
-struct fourteen * handle_fourteen(char byte[8]){
+struct fourteen * handle_fourteen(char byte[9]){
     struct fourteen *fourteen = malloc(sizeof(struct fourteen));
     if(byte[0]=='1'){
         fourteen->C51=1;
@@ -492,7 +502,7 @@ struct fourteen * handle_fourteen(char byte[8]){
     }
     return fourteen;
 }
-struct fifteen * handle_fifteen(char byte[8]){
+struct fifteen * handle_fifteen(char byte[9]){
     struct fifteen *fifteen = malloc(sizeof(struct fifteen));
     if(byte[4]=='1'){
         fifteen->C54=1;
@@ -520,8 +530,7 @@ struct fifteen * handle_fifteen(char byte[8]){
     }
     return fifteen;
 }
-
-struct sixteen * handle_sixteen(char byte[8]){
+struct sixteen * handle_sixteen(char byte[9]){
     struct sixteen *sixteen = malloc(sizeof(struct sixteen));
     if(byte[1]=='1'){
         sixteen->LCEF=1;
@@ -555,9 +564,179 @@ struct sixteen * handle_sixteen(char byte[8]){
     }
     return sixteen;
 }
-
-struct seventeen *handle_seventeen(char byte[8]){
+struct seventeen *handle_seventeen(char byte[9]) {
     struct seventeen *seventeen = malloc(sizeof(struct seventeen));
-    int temp =0;
 
+    // Convert binary string to integer
+    int raw = (int)strtol(byte, NULL, 2);
+
+    // Lookup table of known points {raw_value, temp}
+    int lookup[][2] = {
+        {0,   0},
+        {33,  33},
+        {46,  46},
+        {56,  56},
+        {64,  64},
+        {71,  71},
+        {77,  77},
+        {83,  83},
+        {90,  90},
+        {96,  96},
+        {104, 104},
+        {111, 111},
+        {119, 121},
+        {133, 133},
+        {149, 149},
+        {178, 178},
+        {240, 240}
+    };
+    int n = sizeof(lookup) / sizeof(lookup[0]);
+
+    for (int i = 0; i < n; i++) {
+        if (raw == lookup[i][0]) {
+            seventeen->temp = lookup[i][1];
+            seventeen->temp = seventeen->temp-40;
+            return seventeen;
+        }
+    }
+
+    if (raw < lookup[0][0]) {
+        seventeen->temp = lookup[0][1];
+        seventeen->temp = seventeen->temp-40;
+        return seventeen;
+    }
+
+
+    if (raw > lookup[n-1][0]) {
+        seventeen->temp = lookup[n-1][1];
+        seventeen->temp = seventeen->temp-40;
+        return seventeen;
+    }
+
+    for (int i = 0; i < n - 1; i++) {
+        if (raw > lookup[i][0] && raw < lookup[i+1][0]) {
+            int x0 = lookup[i][0],   y0 = lookup[i][1];
+            int x1 = lookup[i+1][0], y1 = lookup[i+1][1];
+            seventeen->temp = y0 + (raw - x0) * (y1 - y0) / (x1 - x0);
+            seventeen->temp = seventeen->temp-40;
+            return seventeen;
+        }
+    }
+
+    return seventeen;
+}
+struct eighteen *handle_eighteen(char byte[9]) {
+    struct eighteen *eighteen = malloc(sizeof(struct eighteen));
+    if(byte[0]=='1'){
+        eighteen->PARK_NET=1;
+    }
+    else{
+        eighteen->PARK_NET=0;
+    }
+    if(byte[1]=='1'){
+        eighteen->NOT_THIRD=1;
+    }
+    else{
+        eighteen->NOT_THIRD=0;
+    }
+    if(byte[2]=='1'){
+        eighteen->ODR=1;
+    }
+    else{
+        eighteen->ODR=0;
+    }
+    if(byte[3]=='1'){
+        eighteen->PS=1;
+    }
+    else{
+        eighteen->PS=0;
+    }
+    if(byte[4]=='1'){
+        eighteen->EGR_DSC=1;
+    }
+    else{
+        eighteen->EGR_DSC=0;
+    }
+    if(byte[5]=='1'){
+        eighteen->TCC_LOCKED=1;
+    }
+    else{
+        eighteen->TCC_LOCKED=0;
+    }
+    if(byte[6]=='1'){
+        eighteen->FAN_REQ=1;
+    }
+    else{
+        eighteen->FAN_REQ=0;
+    }
+    if(byte[7]=='1'){
+        eighteen->AC_REQ1=1;
+    }
+    else{
+        eighteen->AC_REQ1=0;
+    }
+    return eighteen;
+}
+
+struct nineteen *handle_nineteen(char byte[9]) {
+    struct nineteen *nineteen = malloc(sizeof(struct nineteen));
+    int OLDPA3=0;
+    for(int i =0; i<8;++i){
+        if(byte[i]=='1'){
+            OLDPA3 |= (1 << i);
+        }
+    }
+    nineteen->OLDPA3 = OLDPA3;
+
+    return nineteen;
+}
+
+struct twenty *handle_twenty(char byte[9]) {
+    struct twenty *twenty = malloc(sizeof(struct twenty));
+    int BLM=0;
+    for(int i =0; i<8;++i){
+        if(byte[i]=='1'){
+            BLM |= (1 << i);
+        }
+    }
+    twenty->BLM = BLM;
+
+    return twenty;
+}
+
+struct twentyone *handle_twentyone(char byte[9]) {
+    struct twentyone *twentyone = malloc(sizeof(struct twentyone));
+    int ALDL_CHANGE_COUNTER=0;
+    for(int i =0; i<8;++i){
+        if(byte[i]=='1'){
+            ALDL_CHANGE_COUNTER |= (1 << i);
+        }
+    }
+    twentyone->ALDL_CHANGE_COUNTER = ALDL_CHANGE_COUNTER;
+
+    return twentyone;
+}
+
+struct twentytwo *handle_twentytwo(char byte[9]) {
+    struct twentytwo *twentytwo = malloc(sizeof(struct twentytwo));
+    twentytwo->AFR_MSB[9]=byte;
+    return twentytwo;
+}
+
+struct twentythree *handle_twentythree(char byte[9]) {
+    struct twentythree *twentythree = malloc(sizeof(struct twentythree));
+    twentythree->AFR_LSB[9]=byte;
+    return twentythree;
+}
+
+struct twentyfour *handle_twentyfour(char byte[9]) {
+    struct twentyfour *twentyfour = malloc(sizeof(struct twentyfour));
+    twentyfour->AFR_MSB[9]=byte;
+    return twentyfour;
+}
+
+struct twentyfive *handle_twentyfive(char byte[9]) {
+    struct twentyfive *twentyfive = malloc(sizeof(struct twentyfive));
+    twentyfive->AFR_LSB[9]=byte;
+    return twentyfive;
 }
