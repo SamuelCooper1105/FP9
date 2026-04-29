@@ -32,7 +32,7 @@ struct six{
     int MPH;
 };
 struct seven{
-    int EGR_duty_cycle;
+    float EGR_duty_cycle;
 };
 
 struct eight{
@@ -153,10 +153,138 @@ int main(){
 
 }
 
-char* handle_one(char* byte[8]){
+struct one *handle_one(char* byte[8]){
 
-	if(byte[0] == 1){
+    struct one *one = malloc(sizeof(struct one));
 
+	if(byte[0] == '1'){
+	    one->OVERDRIVE = 1;
+	}
+	else{
+	    one->OVERDRIVE = 0;
 	}
 
+	if(byte[1] == '1'){
+	    one->MALF = 1;
+	}
+	else{
+	    one->MALF = 0;
+	}
+
+	if(byte[2] == '1'){
+	    one->ref_pulse = 1;
+	}
+	else{
+	    one->ref_pulse = 0;
+	}
+
+	if(byte[3] == '1'){
+	    one->ALDL_PULSE = 1;
+	}
+	else{
+	    one->ALDL_PULSE = 0;
+	}
+
+	if(byte[4] == '1'){
+	    one->dia_pos = 1;
+	}
+	else{
+	    one->dia_pos = 0;
+	}
+
+	if(byte[5] == '1'){
+	    one->aldl_pos = 1;
+	}
+	else{
+	    one->aldl_pos = 0;
+	}
+
+	if(byte[6] == '1'){
+	    one->high_bat_volt = 1;
+	}
+	else{
+	    one->high_bat_volt = 0;
+	}
+
+	if(byte[7] == '1'){
+	    one->shigt_light = 1;
+	}
+	else{
+	    one->shigt_light = 0;
+	}
+	return one;
+}
+
+struct two *handle_two(char* byte[8]){
+	struct two *two = malloc(sizeof(struct two));
+	two->PROMID_ONE = byte;
+	return two;
+}
+
+struct three *handle_three(char* byte[8]){
+	struct three *three = malloc(sizeof(struct three));
+	three->PROMID_TWO = byte;
+	return three;
+}
+
+struct four *handle_four(char* byte[8]){
+    struct four *four = malloc(sizeof(struct four));
+    int step =0;
+    for(int i =0, ;i<8;i++){
+        if(byte[i]=='1'){
+            step |= (1 << i);
+        }
+    }
+    four->step = step;
+    return four;
+}
+
+struct five *handle_five(char* byte[8]){
+    struct five *five = malloc(sizeof(struct five));
+    int temp=0;
+    for(int i = 0; i < 8; i++) {
+        if(byte[i] == '1') {
+            temp |= (1 << i);
+        }
+    }
+    temp = temp *(192/256) -40;
+    five->COOLANT_TEMP = temp;
+
+	return five;
+}
+
+struct six *handle_six(char* byte[8]){
+    struct six *six = malloc(sizeof(struct six));
+    int MPH =0;
+    for(int i = 0; i < 8; i++) {
+        if(byte[i] == '1') {
+            MPH |= (1 << i);
+        }
+    }
+    six->MPH = MPH;
+    return six;
+}
+struct seven *handle_seven(char* byte[8]){
+    struct seven *seven = malloc(sizeof(struct seven));
+    int EGR_duty_cycle = 0;
+    for(int i = 0; i < 8; i++) {
+        if(byte[i] == '1') {
+            EGR_duty_cycle |= (1 << i);
+        }
+    }
+    float EGR_duty_cycle = EGR_duty_cycle * 2.56
+    seven->EGR_duty_cycle = EGR_duty_cycle;
+    return seven;
+}
+
+struct eight *handle_eight(char* byte[8]){
+    struct eight *eight = malloc(sizeof(struct eight));
+    int RPM = 0;
+    for(int i = 0; i < 8; i++) {
+        if(byte[i] == '1') {
+            RPM |= (1 << i);
+        }
+    }
+    eight->RPM = RPM;
+    return eight;
 }
