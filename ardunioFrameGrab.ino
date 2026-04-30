@@ -2,10 +2,15 @@
 char bitGrouping[9]; //grouping 9 bits for a byte, first bit is always 0, +8 of data bits
 int bitGroupIndex = 0;
 
+const unsigned long noiseWidths = 100; // noise filter
 const int frameLengthBytes = 25; // byte lenght of one frame
 byte frame[frameLengthBytes]; //frame array of frame length
 int frameIndex = 0;
 bool lockFF = false;
+const unsigned long quietTimeBetween = 50000; // gap between messages
+const unsigned long minReadableZero = 250;// short pulse = logic 0, 1 after invert
+const unsigned long minReadableOne = 2500; // long pulse = logic 1, 0 after invert
+const unsigned long bitTime = 6250; // one bit time (~160 baud)
 
 // Wait for ALDL signal change or times out after one bit, handle long runs of same signal level
 void waitForLineStateChange(int &currentState, unsigned long &changeTime) 
@@ -70,14 +75,10 @@ void setup()
 {
   pinMode(ALDL_PIN, INPUT);
   Serial.begin(115200);
-  Serial.println("Started listening for 1986 Corvette signal");
 }
 
-const unsigned long noiseWidths = 100; // noise filter
-const unsigned long quietTimeBetween = 50000; // gap between messages
-const unsigned long minReadableZero = 250;// short pulse = logic 0, 1 after invert
-const unsigned long minReadableOne = 2500; // long pulse = logic 1, 0 after invert
-const unsigned long bitTime = 6250; // one bit time (~160 baud)
+
+
 
 //loop continuously decode ALDL signal
 void loop() {
@@ -149,15 +150,14 @@ void loop() {
         {
 
           Serial.println(); 
-          for (int i = 0; i < frameLengthBytes; i++) //print frame
+          for (int i = 0; i < frameLengthBytes; i++)
           {
-            if (frame[i] < 16)
-            {
+            if (frame[i] < 16) {
               Serial.print('0');
-              Serial.print(frame[i], HEX);
-              Serial.print(' ');
+            }
 
-            } 
+            Serial.print(frame[i], HEX);
+            Serial.print(' ');
           }
           Serial.println();
 
