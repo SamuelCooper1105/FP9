@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <termios.h>
+#include <errno.h>
+#include <stdbool.h>
 
 struct one{
     bool OVERDRIVE;
@@ -16,11 +18,11 @@ struct one{
     bool shigt_light;
 };
 struct two{
-    char* PROMID_ONE[9];
+    char PROMID_ONE[9];
 
 };
 struct three{
-    char* PROMID_TWO[9];
+    char PROMID_TWO[9];
 };
 
 struct four{
@@ -127,323 +129,17 @@ struct twentyone{
     int ALDL_CHANGE_COUNTER;
 };
 struct twentytwo{
-    char *AFR_MSB[9];
+    char AFR_MSB[9];
 };
 struct twentythree{
-    char *AFR_LSB[9];
+    char AFR_LSB[9];
 };
 struct twentyfour{
-    char *MSB_IBPW[9];
+    char MSB_IBPW[9];
 };
 struct twentyfive{
-    char *LSB_IBPW[9];
+    char LSB_IBPW[9];
 };
-
-int main(){
-
-	//values will be input as a stream of bytes
-	//output file for decoded values
-	FILE *out;
-	out=fopen("output.txt", "w");
-	if(out == NULL){
-		fprintf(stderr, "\nError opened file\n");
-		exit(-1);
-	}
-	//open serial port
-	int serial_port = open("/dev/ttyACM0", O_RDWR);
-
-	if(serial_port < 0){
-		perror("error opening serial port");
-		return 1;
-	}
-
-	struct termios tty;
-
-	tcgetattr(serial_port, &tty);
-	cfsetispeed(&tty, B115200);
-	cfsetospeed(&tty, B115200);
-	tty.c_cflag |= (CLOCAL | CREAD);
-	tty.c_cflag &= ~PARENB; // No parity
-	tty.c_cflag &= ~CSTOPB; // 1 stop bit
-	tty.c_cflag &= ~CSIZE;   // Clear the current char size mask
-	tty.c_cflag |= CS8;      // 8 data bits
-	tcsetattr(serial_port, TCSANOW, &tty);
-
-	char read_buf[128];
-	while(1){
-		int num_bytes = read(serial_port, read_buf, sizeof(read_buf));
-		if (num_bytes > 0){
-			read_buf[num_bytes]='\0';
-		}
-	}
-
-	char one[3];
-	one[0] = read_buf[0];
-	one[1] = read_buf[1];
-	one[2] = '\0';
-	char one_d[9];
-	translate(one,one_d);
-	struct one *one = handle_one(one_d);
-	fprintf(out, "OVERDRIVE: %d\n", one->OVERDRIVE);
-	fprintf(out, "MALF: %d\n", one->MALF);
-	fprintf(out, "ref_pulse: %d\n", one->ref_pulse);
-	fprintf(out, "ALDL_mode: %d\n", one->ALDL_mode);
-	fprintf(out, "dia_pos: %d\n", one->dia_pos);
-	fprintf(out, "aldl_pos: %d\n", one->aldl_pos);
-	fprintf(out, "high_bat_volt: %d\n", one->high_bat_volt);
-	fprintf(out, "shigt_light: %d\n", one->shigt_light);
-	free(one);
-	char two[3];
-	two[0] = read_buf[3];
-	two[1] = read_buf[4];
-	two[2] = '\0';
-	char two_d[9];
-	translate(two, two_d);
-	struct two *two = handle_two(two_d);
-	fprintf(out, "PROMID_ONE: %s\n", two->PROMID_ONE);
-	free(two);
-	char three[3];
-	three[0] = read_buf[6];
-	three[1] = read_buf[7];
-	three[2] = '\0';
-	char three_d[9];
-	translate(three,three_d);
-	struct three *three = handle_three(three_d);
-	fprintf(out,"PROMID_TWO: %s\n", three->PROMID_TWO);
-	free(three);
-	char four[3];
-	four[0] = read_buf[9];
-	four[1] = read_buf[10];
-	four[2] = '\0';
-	char four_d[9];
-	translate(four,four_d);
-	struct four *four = handle_four(four_d);
-	fprintf(out,"step_count: %d\n",four->step_count);
-	free(four);
-	char five[3];
-	five[0] = read_buf[12];
-	five[1] = read_buf[13];
-	five[2] = '\0';
-	char five_d[9];
-	translate(five,five_d);
-	struct five *five = handle_five(five_d);
-	fprintf(out,"COOLANT_TEMP: %d\n", five->COOLANT_TEMP);
-	free(five);
-	char six[3];
-	six[0] = read_buf[15];
-	six[1] = read_buf[16];
-	six[2] = '\0';
-	char six_d[9];
-	translate(six,six_d);
-	struct six *six = handle_six(six_d);
-	fprintf(out,"MPH: %d\n", six->MPH);
-	free(six);
-	char seven[3];
-	seven[0] = read_buf[18];
-	seven[1] = read_buf[19];
-	seven[2] = '\0';
-	char seven_d[9];
-	translate(seven,seven_d);
-	struct seven *seven = handle_seven(seven_d);
-	fprintf(out,"EGR_duty_cycle: %d\n", seven->EGR_duty_cycle);
-	free(seven);
-	char eight[3];
-	eight[0] = read_buf[21];
-	eight[1] = read_buf[22];
-	eight[2] = '\0';
-	char eight_d[9];
-	translate(eight, eight_d);
-	struct eight *eight = handle_eight(eight_d);
-	fprintf(out,"RPM: %d\n", eight->RPM);
-	free(eight);
-	char nine[3];
-	nine[0] = read_buf[24];
-	nine[1] = read_buf[25];
-	nine[2] = '\0';
-	char nine_d[9];
-	translate(nine, nine_d);
-	struct nine *nine = handle_nine(nine_d);
-	fprintf(out,"THROTTLE_POS: %d\n",nine->THROTTLE_POS);
-	free(nine);
-	char ten[3];
-	ten[0] = read_buf[27];
-	ten[1] = read_buf[28];
-	ten[2] = '\0';
-	char ten_d[9];
-	translate(ten, ten_d);
-	struct ten *ten = handle_ten(ten_d);
-	fprintf(out,"BPCLC: %d\n", ten->BPCLC);
-	free(ten);
-	char eleven[3];
-	eleven[0] = read_buf[30];
-	eleven[1] = read_buf[31];
-	eleven[2] = '\0';
-	char eleven_d[9];
-	translate(eleven,eleven_d);
-	struct eleven *eleven = handle_eleven(eleven_d);
-	fprintf(out,"OXYGEN_SENSOR: %d\n", eleven->OXYGEN_SENSOR);
-	free(eleven);
-	char twelve[3];
-	twelve[0] = read_buf[33];
-	twelve[1] = read_buf[34];
-	twelve[2] = '\0';
-	char twelve_d[9];
-	translate(twelve,twelve_d);
-	struct twelve *twelve = handle_twelve(twelve_d);
-	fprintf(out,"MAT_SENS: %d\n", twelve->MAT_SENS);
-	fprintf(out,"C22: %d\n", twelve->C22);
-	fprintf(out,"C21: %d\n", twelve->C21);
-	fprintf(out,"C15: %d\n", twelve->C15);
-	fprintf(out,"C14: %d\n", twelve->C14);
-	fprintf(out,"C13: %d\n", twelve->C13);
-	fprintf(out,"C12: %d\n", twelve->C12);
-	free(twelve);
-	char thirteen[3];
-	thirteen[0] = read_buf[36];
-	thirteen[1] = read_buf[37];
-	thirteen[2] = '\0';
-	char thirteen_d[9];
-	translate(thirteen,thirteen_d);
-	struct thirteen *thirteen = handle_thirteen(thirteen_d);
-	fprintf(out,"C34: %d\n", thirteen->C34);
-	fprintf(out,"C33: %d\n", thirteen->C33);
-	fprintf(out,"C32: %d\n", thirteen->C32);
-	fprintf(out,"C25: %d\n", thirteen->C25);
-	fprintf(out,"C24: %d\n", thirteen->C24);
-	free(thirteen);
-	char fourteen[3];
-	fourteen[0] = read_buf[39];
-	fourteen[1] = read_buf[40];
-	fourteen[2] = '\0';
-	char fourteen_d[9];
-	translate(fourteen,fourteen_d);
-	struct fourteen *fourteen = handle_fourteen(fourteen_d);
-	fprintf(out,"C51: %d\n", fourteen->C51);
-	fprintf(out,"C46: %d\n", fourteen->C46);
-	fprintf(out,"C45: %d\n", fourteen->C45);
-	fprintf(out,"C44: %d\n", fourteen->C44);
-	fprintf(out,"C43: %d\n", fourteen->C43);
-	fprintf(out,"C42: %d\n", fourteen->C42);
-	fprintf(out,"C41: %d\n", fourteen->C41);
-	fprintf(out,"C36: %d\n", fourteen->C36);
-	free(fourteen);
-	char fifteen[3];
-	fifteen[0] = read_buf[42];
-	fifteen[1] = read_buf[43];
-	fifteen[2] = '\0';
-	char fifteen_d[9];
-	translate(fifteen,fifteen_d);
-	struct fifteen *fifteen = handle_fifteen(fifteen_d);
-	fprintf(out,"C54: %d\n", fifteen->C54);
-	fprintf(out,"C53: %d\n", fifteen->C53);
-	fprintf(out,"C52: %d\n", fifteen->C52);
-	fprintf(out,"C51: %d\n", fifteen->C51);
-	free(fifteen);
-	char sixteen[3];
-	sixteen[0] = read_buf[45];
-	sixteen[1] = read_buf[46];
-	sixteen[2] = '\0';
-	char sixteen_d[9];
-	translate(sixteen,sixteen_d);
-	struct sixteen *sixteen = handle_sixteen(sixteen_d);
-	fprintf(out,"LCEF: %d\n", sixteen->LCEF);
-	fprintf(out,"VSSF: %d\n", sixteen->VSSF);
-	fprintf(out,"ES02RLF: %d\n", sixteen->ES02RLF);
-	fprintf(out,"RICH_LEANF: %d\n", sixteen->RICH_LEANF);
-	fprintf(out,"CLOSED_LOOPF: %d\n", sixteen->CLOSED_LOOPF);
-	free(sixteen);
-	char seventeen[3];
-	seventeen[0] = read_buf[48];
-	seventeen[1] = read_buf[49];
-	seventeen[2] = '\0';
-	char seventeen_d[9];
-	translate(seventeen,seventeen_d);
-	struct seventeen *seventeen = handle_seventeen(seventeen_d);
-	fprintf(out,"Temp: %d\n", seventeen->temp);
-	free(seventeen);
-	char eighteen[3];
-	eighteen[0] = read_buf[51];
-	eighteen[1] = read_buf[52];
-	eighteen[2] = '\0';
-	char eighteen_d[9];
-	translate(eighteen,eighteen_d);
-	struct eighteen *eighteen = handle_eighteen(eighteen_d);
-	fprintf(out,"PARK_NET: %d\n", eighteen->park_net);
-	fprintf(out,"NOT_THIRD: %d\n", eighteen->not_third);
-	fprintf(out,"ODR: %d\n", eighteen->ODR);
-	fprintf(out,"PS: %d\n", eighteen->PS);
-	fprintf(out,"EGR_DSC: %d\n", eighteen->EGR_DSC);
-	fprintf(out,"TCC_LOCKED: %d\n", eighteen->TCC_LOCKED);
-	fprintf(out,"FAN_REQ: %d\n", eighteen->FAN_REQ);
-	fprintf(out,"AC_REQ1: %d\n", eighteen->AC_REQ1);
-	free(eighteen);
-	char nineteen[3];
-	nineteen[0] = read_buf[54];
-	nineteen[1] = read_buf[55];
-	nineteen[2] = '\0';
-	char nineteen_d[9];
-	translate(nineteen,nineteen_d);
-	struct nineteen *nineteen = handle_nineteen(nineteen_d);
-	fprintf(out,"OLDPA3: %d\n", nineteen->OLDPA3);
-	free(nineteen);
-	char twenty[3];
-	twenty[0] = read_buf[57];
-	twenty[1] = read_buf[58];
-	twenty[2] = '\0';
-	char twenty_d[9];
-	translate(twenty,twenty_d);
-	struct twenty *twenty = handle_twenty(twenty_d);
-	fprintf(out,"BLM: %d\n", twenty->BLM);
-	free(twenty);
-	char twentyone[3];
-	twentyone[0] = read_buf[60];
-	twentyone[1] = read_buf[61];
-	twentyone[2] = '\0';
-	char twentyone_d[9];
-	translate(twentyone,twentyone_d);
-	struct twentyone *twentyone = handle_twentyone(twentyone_d);
-	fprintf(out,"ALDL_CHANGE_COUNTER: %d\n", twentyone->ALDL_CHANGE_COUNTER);
-	free(twentyone);
-	char twentytwo[3];
-	twentytwo[0] = read_buf[63];
-	twentytwo[1] = read_buf[64];
-	twentytwo[2] = '\0';
-	char twentytwo_d[9];
-	translate(twentytwo,twentytwo_d);
-	struct twentyone *twentytwo = handle_twentyone(twentytwo_d);
-	fprintf(out,"AFT_MSB: %s\n", twentytwo->AFT_MSB);
-	free(twentytwo);
-	char twentythree[3];
-	twentythree[0] = read_buf[66];
-	twentythree[1] = read_buf[67];
-	twentythree[2] = '\0';
-	char twentythree_d[9];
-	translate(twentythree,twentythree_d);
-	struct twentyone *twentythree = handle_twentyone(twentythree_d);
-	fprintf(out,"AFR_LSB: %s\n", twentythree->AFR_LSB);
-	free(twentythree);
-	char twentyfour[3];
-	twentyfour[0] = read_buf[69];
-	twentyfour[1] = read_buf[70];
-	twentyfour[2] = '\0';
-	char twentyfour_d[9];
-	translate(twentyfour,twentyfour_d);
-	struct twentyone *twentyfour = handle_twentyone(twentyfour_d);
-	fprintf(out,"MSB_IBPW: %s\n", twentyfour->MSB_IBPW);
-	free(twentyfour);
-	char twentyfive[3];
-	twentyfive[0] = read_buf[72];
-	twentyfive[1] = read_buf[73];
-	twentyfive[2] = '\0';
-	char twentyfive_d[9];
-	translate(twentyfive,twentyfive_d);
-	struct twentyone *twentyfive = handle_twentyone(twentyfive_d);
-	fprintf(out,"LSB_IBPW: %s\n", twentyfive->LSB_IBPW);
-	free(twentyfive);
-	close(serial_port);
-	fclose(out);
-	return 0;
-}
 
 void translate(char hex[3], char res[9]) {
     char* map[16] = {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"};
@@ -497,10 +193,10 @@ struct one *handle_one(char byte[9]){
 	}
 
 	if(byte[3] == '1'){
-	    one->ALDL_PULSE = 1;
+	    one->ALDL_mode = 1;
 	}
 	else{
-	    one->ALDL_PULSE = 0;
+	    one->ALDL_mode = 0;
 	}
 
 	if(byte[4] == '1'){
@@ -558,12 +254,12 @@ struct four *handle_four(char byte[9]){
         exit(-1);
     }
     int step =0;
-    for(int i =0, ;i<8;i++){
+    for(int i =0;i<8;i++){
         if(byte[i]=='1'){
             step |= (1 << i);
         }
     }
-    four->step = step;
+    four->step_count = step;
     return four;
 }
 struct five *handle_five(char byte[9]){
@@ -578,8 +274,8 @@ struct five *handle_five(char byte[9]){
             temp |= (1 << i);
         }
     }
-    temp = temp *(192/256) -40;
-    five->COOLANT_TEMP = temp;
+    float coolant_temp = temp *(192.0f/256.0f) -40;
+    five->COOLANT_TEMP = coolant_temp;
 
 	return five;
 }
@@ -604,13 +300,13 @@ struct seven *handle_seven(char byte[9]){
         fprintf(stderr,"%s: could not allocate memory for seven; %s\n", "seven", strerror(errno));
         exit(-1);
     }
-    int EGR_duty_cycle = 0;
+    int EDR = 0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
-            EGR_duty_cycle |= (1 << i);
+            EDR |= (1 << i);
         }
     }
-    float EGR_duty_cycle = EGR_duty_cycle * 2.56
+    float EGR_duty_cycle = EDR * 2.56;
     seven->EGR_duty_cycle = EGR_duty_cycle;
     return seven;
 }
@@ -636,14 +332,14 @@ struct nine *handle_nine(char byte[9]) {
         fprintf(stderr,"%s: could not allocate memory for nine; %s\n", "nine", strerror(errno));
         exit(-1);
     }
-    int TP = 0;
+    int tmp = 0;
     for(int i =0;i<8;++i){
         if(byte[i] == '1'){
-            TP |= (1 << i);
+            tmp |= (1 << i);
         }
     }
-    float TP = TP * .0196;
-    nine->TP = TP;
+    float TP = tmp * .0196;
+    nine->THROTTLE_POS = TP;
     return nine;
 }
 struct ten *handle_ten(char byte[9]){
@@ -659,7 +355,7 @@ struct ten *handle_ten(char byte[9]){
         }
     }
 
-    ten->BP = BP;
+    ten->BPCLC = BP;
     return ten;
 }
 struct eleven *handle_eleven(char byte[9]){
@@ -668,14 +364,14 @@ struct eleven *handle_eleven(char byte[9]){
         fprintf(stderr,"%s: could not allocate memory for eleven; %s\n", "eleven", strerror(errno));
         exit(-1);
     }
-    int OS = 0;
+    int tmp = 0;
     for(int i = 0; i < 8; i++) {
         if(byte[i] == '1') {
-            OS |= (1 << i);
+            tmp |= (1 << i);
         }
     }
-    float OS = OS * 4.44;
-    eleven->OS = OS;
+    float OS = tmp * 4.44;
+    eleven->OXYGEN_SENSOR = OS;
     return eleven;
 }
 struct twelve *handle_twelve(char byte[9]){
@@ -1012,10 +708,10 @@ struct eighteen *handle_eighteen(char byte[9]) {
         eighteen->FAN_REQ=0;
     }
     if(byte[7]=='1'){
-        eighteen->AC_REQ1=1;
+        eighteen->AC_REQ=1;
     }
     else{
-        eighteen->AC_REQ1=0;
+        eighteen->AC_REQ=0;
     }
     return eighteen;
 }
@@ -1077,7 +773,7 @@ struct twentytwo *handle_twentytwo(char byte[9]) {
         fprintf(stderr,"%s: could not allocate memory for twentytwo; %s\n", "twentytwo", strerror(errno));
         exit(-1);
     }
-    strcpy(twentytwo->AFR_MSB[9], byte);
+    strcpy(twentytwo->AFR_MSB, byte);
     return twentytwo;
 }
 
@@ -1087,7 +783,7 @@ struct twentythree *handle_twentythree(char byte[9]) {
         fprintf(stderr,"%s: could not allocate memory for twentythree; %s\n", "twentythree", strerror(errno));
         exit(-1);
     }
-    strcpy(twentythree->AFR_LSB[9], byte);
+    strcpy(twentythree->AFR_LSB, byte);
     return twentythree;
 }
 
@@ -1097,7 +793,7 @@ struct twentyfour *handle_twentyfour(char byte[9]) {
         fprintf(stderr,"%s: could not allocate memory for twentyfour; %s\n", "twentyfour", strerror(errno));
         exit(-1);
     }
-    strcpy(twentyfour->MSB_IBPW[9], byte);
+    strcpy(twentyfour->MSB_IBPW, byte);
     return twentyfour;
 }
 
@@ -1107,6 +803,313 @@ struct twentyfive *handle_twentyfive(char byte[9]) {
         fprintf(stderr,"%s: could not allocate memory for twentyfive; %s\n", "twentyfive", strerror(errno));
         exit(-1);
     }
-    strcpy(twentyfive->LSB_IBPW[9], byte);
+    strcpy(twentyfive->LSB_IBPW, byte);
     return twentyfive;
+}
+
+int main(){
+
+	//values will be input as a stream of bytes
+	//output file for decoded values
+	FILE *out;
+	out=fopen("output.txt", "w");
+	if(out == NULL){
+		fprintf(stderr, "\nError opened file\n");
+		exit(-1);
+	}
+	//open serial port
+	int serial_port = open("/dev/ttyACM0", O_RDWR);
+
+	if(serial_port < 0){
+		perror("error opening serial port");
+		return 1;
+	}
+
+	struct termios tty;
+	//associates serial port with tty struct
+	tcgetattr(serial_port, &tty);
+	cfsetispeed(&tty, B115200);
+	cfsetospeed(&tty, B115200);
+	tty.c_cflag |= (CLOCAL | CREAD);
+	tty.c_cflag &= ~PARENB; // No parity
+	tty.c_cflag &= ~CSTOPB; // 1 stop bit
+	tty.c_cflag &= ~CSIZE;   // Clear the current char size mask
+	tty.c_cflag |= CS8;      // 8 data bits
+	tcsetattr(serial_port, TCSANOW, &tty);
+
+	char read_buf[128];
+	while(1){
+		int num_bytes = read(serial_port, read_buf, sizeof(read_buf));
+		if (num_bytes > 0){
+			read_buf[num_bytes]='\0';
+		}
+		char one_h[3];
+		one_h[0] = read_buf[0];
+		one_h[1] = read_buf[1];
+		one_h[2] = '\0';
+		char one_d[9];
+		translate(one_h, one_d);
+		struct one *one = handle_one(one_d);
+		fprintf(out, "OVERDRIVE: %d\n", one->OVERDRIVE);
+		fprintf(out, "MALF: %d\n", one->MALF);
+		fprintf(out, "ref_pulse: %d\n", one->ref_pulse);
+		fprintf(out, "ALDL_mode: %d\n", one->ALDL_mode);
+		fprintf(out, "dia_pos: %d\n", one->dia_pos);
+		fprintf(out, "aldl_pos: %d\n", one->aldl_pos);
+		fprintf(out, "high_bat_volt: %d\n", one->high_bat_volt);
+		fprintf(out, "shigt_light: %d\n", one->shigt_light);
+		free(one);
+		char two_h[3];
+		two_h[0] = read_buf[3];
+		two_h[1] = read_buf[4];
+		two_h[2] = '\0';
+		char two_d[9];
+		translate(two_h, two_d);
+		struct two *two = handle_two(two_d);
+		fprintf(out, "PROMID_ONE: %s\n", two->PROMID_ONE);
+		free(two);
+		char three_h[3];
+		three_h[0] = read_buf[6];
+		three_h[1] = read_buf[7];
+		three_h[2] = '\0';
+		char three_d[9];
+		translate(three_h,three_d);
+		struct three *three = handle_three(three_d);
+		fprintf(out,"PROMID_TWO: %s\n", three->PROMID_TWO);
+		free(three);
+		char four_h[3];
+		four_h[0] = read_buf[9];
+		four_h[1] = read_buf[10];
+		four_h[2] = '\0';
+		char four_d[9];
+		translate(four_h,four_d);
+		struct four *four = handle_four(four_d);
+		fprintf(out,"step_count: %d\n",four->step_count);
+		free(four);
+		char five_h[3];
+		five_h[0] = read_buf[12];
+		five_h[1] = read_buf[13];
+		five_h[2] = '\0';
+		char five_d[9];
+		translate(five_h,five_d);
+		struct five *five = handle_five(five_d);
+		fprintf(out,"COOLANT_TEMP: %d\n", five->COOLANT_TEMP);
+		free(five);
+		char six_h[3];
+		six_h[0] = read_buf[15];
+		six_h[1] = read_buf[16];
+		six_h[2] = '\0';
+		char six_d[9];
+		translate(six_h,six_d);
+		struct six *six = handle_six(six_d);
+		fprintf(out,"MPH: %d\n", six->MPH);
+		free(six);
+		char seven_h[3];
+		seven_h[0] = read_buf[18];
+		seven_h[1] = read_buf[19];
+		seven_h[2] = '\0';
+		char seven_d[9];
+		translate(seven_h,seven_d);
+		struct seven *seven = handle_seven(seven_d);
+		fprintf(out,"EGR_duty_cycle: %f\n", seven->EGR_duty_cycle);
+		free(seven);
+		char eight_h[3];
+		eight_h[0] = read_buf[21];
+		eight_h[1] = read_buf[22];
+		eight_h[2] = '\0';
+		char eight_d[9];
+		translate(eight_h, eight_d);
+		struct eight *eight = handle_eight(eight_d);
+		fprintf(out,"RPM: %d\n", eight->RPM);
+		free(eight);
+		char nine_h[3];
+		nine_h[0] = read_buf[24];
+		nine_h[1] = read_buf[25];
+		nine_h[2] = '\0';
+		char nine_d[9];
+		translate(nine_h, nine_d);
+		struct nine *nine = handle_nine(nine_d);
+		fprintf(out,"THROTTLE_POS: %d\n",nine->THROTTLE_POS);
+		free(nine);
+		char ten_h[3];
+		ten_h[0] = read_buf[27];
+		ten_h[1] = read_buf[28];
+		ten_h[2] = '\0';
+		char ten_d[9];
+		translate(ten_h, ten_d);
+		struct ten *ten = handle_ten(ten_d);
+		fprintf(out,"BPCLC: %d\n", ten->BPCLC);
+		free(ten);
+		char eleven_h[3];
+		eleven_h[0] = read_buf[30];
+		eleven_h[1] = read_buf[31];
+		eleven_h[2] = '\0';
+		char eleven_d[9];
+		translate(eleven_h,eleven_d);
+		struct eleven *eleven = handle_eleven(eleven_d);
+		fprintf(out,"OXYGEN_SENSOR: %d\n", eleven->OXYGEN_SENSOR);
+		free(eleven);
+		char twelve_h[3];
+		twelve_h[0] = read_buf[33];
+		twelve_h[1] = read_buf[34];
+		twelve_h[2] = '\0';
+		char twelve_d[9];
+		translate(twelve_h,twelve_d);
+		struct twelve *twelve = handle_twelve(twelve_d);
+		fprintf(out,"MAT_SENS: %d\n", twelve->MAT_SENS);
+		fprintf(out,"C22: %d\n", twelve->C22);
+		fprintf(out,"C21: %d\n", twelve->C21);
+		fprintf(out,"C15: %d\n", twelve->C15);
+		fprintf(out,"C14: %d\n", twelve->C14);
+		fprintf(out,"C13: %d\n", twelve->C13);
+		fprintf(out,"C12: %d\n", twelve->C12);
+		free(twelve);
+		char thirteen_h[3];
+		thirteen_h[0] = read_buf[36];
+		thirteen_h[1] = read_buf[37];
+		thirteen_h[2] = '\0';
+		char thirteen_d[9];
+		translate(thirteen_h,thirteen_d);
+		struct thirteen *thirteen = handle_thirteen(thirteen_d);
+		fprintf(out,"C34: %d\n", thirteen->C34);
+		fprintf(out,"C33: %d\n", thirteen->C33);
+		fprintf(out,"C32: %d\n", thirteen->C32);
+		fprintf(out,"C25: %d\n", thirteen->C25);
+		fprintf(out,"C24: %d\n", thirteen->C24);
+		free(thirteen);
+		char fourteen_h[3];
+		fourteen_h[0] = read_buf[39];
+		fourteen_h[1] = read_buf[40];
+		fourteen_h[2] = '\0';
+		char fourteen_d[9];
+		translate(fourteen_h,fourteen_d);
+		struct fourteen *fourteen = handle_fourteen(fourteen_d);
+		fprintf(out,"C51: %d\n", fourteen->C51);
+		fprintf(out,"C46: %d\n", fourteen->C46);
+		fprintf(out,"C45: %d\n", fourteen->C45);
+		fprintf(out,"C44: %d\n", fourteen->C44);
+		fprintf(out,"C43: %d\n", fourteen->C43);
+		fprintf(out,"C42: %d\n", fourteen->C42);
+		fprintf(out,"C41: %d\n", fourteen->C41);
+		fprintf(out,"C36: %d\n", fourteen->C36);
+		free(fourteen);
+		char fifteen_h[3];
+		fifteen_h[0] = read_buf[42];
+		fifteen_h[1] = read_buf[43];
+		fifteen_h[2] = '\0';
+		char fifteen_d[9];
+		translate(fifteen_h,fifteen_d);
+		struct fifteen *fifteen = handle_fifteen(fifteen_d);
+		fprintf(out,"C54: %d\n", fifteen->C54);
+		fprintf(out,"C53: %d\n", fifteen->C53);
+		fprintf(out,"C52: %d\n", fifteen->C52);
+		fprintf(out,"C51: %d\n", fifteen->C51);
+		free(fifteen);
+		char sixteen_h[3];
+		sixteen_h[0] = read_buf[45];
+		sixteen_h[1] = read_buf[46];
+		sixteen_h[2] = '\0';
+		char sixteen_d[9];
+		translate(sixteen_h,sixteen_d);
+		struct sixteen *sixteen = handle_sixteen(sixteen_d);
+		fprintf(out,"LCEF: %d\n", sixteen->LCEF);
+		fprintf(out,"VSSF: %d\n", sixteen->VSSF);
+		fprintf(out,"ES02RLF: %d\n", sixteen->ES02RLF);
+		fprintf(out,"RICH_LEANF: %d\n", sixteen->RICH_LEANF);
+		fprintf(out,"CLOSED_LOOPF: %d\n", sixteen->CLOSED_LOOPF);
+		free(sixteen);
+		char seventeen_h[3];
+		seventeen_h[0] = read_buf[48];
+		seventeen_h[1] = read_buf[49];
+		seventeen_h[2] = '\0';
+		char seventeen_d[9];
+		translate(seventeen_h,seventeen_d);
+		struct seventeen *seventeen = handle_seventeen(seventeen_d);
+		fprintf(out,"Temp: %d\n", seventeen->temp);
+		free(seventeen);
+		char eighteen_h[3];
+		eighteen_h[0] = read_buf[51];
+		eighteen_h[1] = read_buf[52];
+		eighteen_h[2] = '\0';
+		char eighteen_d[9];
+		translate(eighteen_h,eighteen_d);
+		struct eighteen *eighteen = handle_eighteen(eighteen_d);
+		fprintf(out,"PARK_NET: %d\n", eighteen->PARK_NET);
+		fprintf(out,"NOT_THIRD: %d\n", eighteen->NOT_THIRD);
+		fprintf(out,"ODR: %d\n", eighteen->ODR);
+		fprintf(out,"PS: %d\n", eighteen->PS);
+		fprintf(out,"EGR_DSC: %d\n", eighteen->EGR_DSC);
+		fprintf(out,"TCC_LOCKED: %d\n", eighteen->TCC_LOCKED);
+		fprintf(out,"FAN_REQ: %d\n", eighteen->FAN_REQ);
+		fprintf(out,"AC_REQ: %d\n", eighteen->AC_REQ);
+		free(eighteen);
+		char nineteen_h[3];
+		nineteen_h[0] = read_buf[54];
+		nineteen_h[1] = read_buf[55];
+		nineteen_h[2] = '\0';
+		char nineteen_d[9];
+		translate(nineteen_h,nineteen_d);
+		struct nineteen *nineteen = handle_nineteen(nineteen_d);
+		fprintf(out,"OLDPA3: %d\n", nineteen->OLDPA3);
+		free(nineteen);
+		char twenty_h[3];
+		twenty_h[0] = read_buf[57];
+		twenty_h[1] = read_buf[58];
+		twenty_h[2] = '\0';
+		char twenty_d[9];
+		translate(twenty_h,twenty_d);
+		struct twenty *twenty = handle_twenty(twenty_d);
+		fprintf(out,"BLM: %d\n", twenty->BLM);
+		free(twenty);
+		char twentyone_h[3];
+		twentyone_h[0] = read_buf[60];
+		twentyone_h[1] = read_buf[61];
+		twentyone_h[2] = '\0';
+		char twentyone_d[9];
+		translate(twentyone_h,twentyone_d);
+		struct twentyone *twentyone = handle_twentyone(twentyone_d);
+		fprintf(out,"ALDL_CHANGE_COUNTER: %d\n", twentyone->ALDL_CHANGE_COUNTER);
+		free(twentyone);
+		char twentytwo_h[3];
+		twentytwo_h[0] = read_buf[63];
+		twentytwo_h[1] = read_buf[64];
+		twentytwo_h[2] = '\0';
+		char twentytwo_d[9];
+		translate(twentytwo_h,twentytwo_d);
+		struct twentytwo *twentytwo = handle_twentytwo(twentytwo_d);
+		fprintf(out,"AFR_MSB: %s\n", twentytwo->AFR_MSB);
+		free(twentytwo);
+		char twentythree_h[3];
+		twentythree_h[0] = read_buf[66];
+		twentythree_h[1] = read_buf[67];
+		twentythree_h[2] = '\0';
+		char twentythree_d[9];
+		translate(twentythree_h,twentythree_d);
+		struct twentythree *twentythree = handle_twentythree(twentythree_d);
+		fprintf(out,"AFR_LSB: %s\n", twentythree->AFR_LSB);
+		free(twentythree);
+		char twentyfour_h[3];
+		twentyfour_h[0] = read_buf[69];
+		twentyfour_h[1] = read_buf[70];
+		twentyfour_h[2] = '\0';
+		char twentyfour_d[9];
+		translate(twentyfour_h,twentyfour_d);
+		struct twentyfour *twentyfour = handle_twentyfour(twentyfour_d);
+		fprintf(out,"MSB_IBPW: %s\n", twentyfour->MSB_IBPW);
+		free(twentyfour);
+		char twentyfive_h[3];
+		twentyfive_h[0] = read_buf[72];
+		twentyfive_h[1] = read_buf[73];
+		twentyfive_h[2] = '\0';
+		char twentyfive_d[9];
+		translate(twentyfive_h,twentyfive_d);
+		struct twentyfive *twentyfive = handle_twentyfive(twentyfive_d);
+		fprintf(out,"LSB_IBPW: %s\n", twentyfive->LSB_IBPW);
+		free(twentyfive);
+		break;
+	}
+
+	close(serial_port);
+	fclose(out);
+	return 0;
 }
