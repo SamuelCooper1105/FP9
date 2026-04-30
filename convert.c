@@ -143,7 +143,6 @@ struct twentyfive{
 
 void translate(char hex[3], char res[9]) {
     char* map[16] = {"0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"};
-    char MSB[5];
     int im;
     int il;
     if(hex[0] >= '0' && hex[0] <= '9'){
@@ -835,14 +834,35 @@ int main(){
 	tty.c_cflag &= ~CSTOPB; // 1 stop bit
 	tty.c_cflag &= ~CSIZE;   // Clear the current char size mask
 	tty.c_cflag |= CS8;      // 8 data bits
+	tty.c_lflag |= ICANON;
+	tty.c_lflag &= ~(ECHO | ECHOE | ISIG);
+
+	tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+	tty.c_iflag &= ~(ICRNL | INLCR | IGNCR);
+	tty.c_oflag &= ~OPOST;
+	tty.c_cc[VMIN] = 1;
+	tty.c_cc[VTIME] = 0;
+
 	tcsetattr(serial_port, TCSANOW, &tty);
 
-	char read_buf[128];
+	char read_buf[256];
 	while(1){
-		int num_bytes = read(serial_port, read_buf, sizeof(read_buf));
-		if (num_bytes > 0){
-			read_buf[num_bytes]='\0';
+	    int p = 0;
+		while(p < sizeof(read_buf)-1){
+			char c;
+			int n = read(serial_port, &c,1);
+			if(n>0){
+				if(c=='\n') break;
+				if(c!='\r') read_buf[p++]=c;
+			}
 		}
+		read_buf[p] = '\0';
+
+		if(p ==0)continue;
+
+        printf("Line: '%s'\n", read_buf);
+        printf("Length: %d chars\n", p);
+
 		char one_h[3];
 		one_h[0] = read_buf[0];
 		one_h[1] = read_buf[1];
@@ -1106,7 +1126,7 @@ int main(){
 		struct twentyfive *twentyfive = handle_twentyfive(twentyfive_d);
 		fprintf(out,"LSB_IBPW: %s\n", twentyfive->LSB_IBPW);
 		free(twentyfive);
-		break;
+		//break;
 	}
 
 	close(serial_port);
