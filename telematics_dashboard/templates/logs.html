@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trip Logs</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>Trip Logs</h1>
+        <p>Recent Saved Vehicle Data</p>
+        <a class="logout-button" href="/dashboard">Back to Dashboard</a>
+        <a class="logout-button" href="/logout">Logout</a>
+    </div>
+
+    <div class="logs-container">
+        <table>
+            <tr>
+                <th>Time</th>
+                <th>RPM</th>
+                <th>Coolant</th>
+                <th>Throttle</th>
+                <th>Battery</th>
+                <th>Speed</th>
+                <th>Engine Load</th>
+            </tr>
+
+            {% for row in rows %}
+            <tr>
+               <td>{{ row.time }}</td>
+               <td>{{ row.rpm }}</td>
+               <td>{{ row.coolant_temp }} °F</td>
+               <td>{{ row.throttle }}%</td>
+               <td>{{ row.battery }} V</td>
+               <td>{{ row.speed }} MPH</td>
+               <td>{{ row.engine_load }}%</td>
+           </tr>
+           {% endfor %}
+       </table>
+   </div>
+</body>
+</html>

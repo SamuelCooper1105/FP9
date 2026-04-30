@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Trip Summary</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>Trip Summary</h1>
+        <p>Calculated Results From Logged Vehicle Data</p>
+        <a class="logout-button" href="/dashboard">Back to Dashboard</a>
+        <a class="logout-button" href="/logs">Trip Logs</a>
+        <a class="logout-button" href="/logout">Logout</a>
+    </div>
+
+    <div class="dashboard">
+        
+        <div class="card">
+            <h2>Total Records</h2>
+            <p>{{ summary[0] }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Average RPM</h2>
+            <p>{{ summary[1] }}</p>
+        </div>
+
+        <div class="card">
+            <h2>Max Coolant Temp</h2>
+            <p>{{ summary[2] }} °F</p>
+        </div>
+
+        <div class="card">
+            <h2>Average Battery</h2>
+            <p>{{ summary[3] }} V</p>
+        </div>
+
+        <div class="card">
+            <h2>Max Speed</h2>
+            <p>{{ summary[4] }} MPH</p>
+        </div>
+
+        <div class="card">
+            <h2>Average Engine Load</h2>
+            <p>{{ summary[5] }}%</p>
+        </div>
+
+    </div>
+</body>
+</html>

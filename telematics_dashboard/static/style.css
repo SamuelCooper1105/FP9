@@ -1,0 +1,103 @@
+body {
+    background-color: #101820;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+.header {
+    background-color: #1f2933;
+    padding: 20px;
+    text-align: center;
+}
+
+.dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.card {
+    background-color: #1e2a36;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+.card h2 {
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: #9fb3c8;
+}
+
+.card p {
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+}
+
+.login-box {
+    background-color: #1f2933;
+    width: 320px;
+    margin: 120px auto;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.login-box input {
+    width: 90%;
+    padding: 12px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 6px;
+}
+
+.login-box button {
+    width: 95%;
+    padding: 12px;
+    background-color: #2f80ed;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.error {
+    color: #ff6b6b;
+    font-weight: bold;
+}
+
+.logout-button {
+    display: inline_block;
+    background-color: #d9534f;
+    color: white;
+    padding: 8px 14px:
+    border-radius: 6px;
+    text-decoration: none;
+    margin-top: 10px;
+}
+
+.logs-container {
+    padding: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #1f2933;
+    color: white;
+}
+
+th {
+    background-color: #2f80ed;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #34495e;
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Telematics Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <div class="header">
+        <h1>Telematic Dashboard</h1>
+        <p>Pre-OBD Live Vehicle Data</p>
+
+        <a class="logout-button" href="/logs">Trip Logs</a>
+        <a class="logout-button" href="/summary">Trip Summary</a>
+        <a class="logout-button" href="/logout">Logout</a>
+    </div>
+
+    <div class="dashboard">
+
+        <!-- BASIC -->
+        <div class="card">
+            <h2>RPM</h2>
+            <p id="rpm">--</p>
+        </div>
+
+        <div class="card">
+            <h2>Coolant Temp</h2>
+            <p id="coolant">-- °F</p>
+        </div>
+
+        <div class="card">
+            <h2>Speed</h2>
+            <p id="speed">-- MPH</p>
+        </div>
+
+        <div class="card">
+            <h2>Throttle (TPS)</h2>
+            <p id="tps">-- V</p>
+        </div>
+
+        <div class="card">
+            <h2>O2 Sensor</h2>
+            <p id="o2">-- mV</p>
+        </div>
+
+        <div class="card">
+            <h2>MAT Temp</h2>
+            <p id="mat">-- °F</p>
+        </div>
+
+        <!-- CONTROL / ENGINE -->
+        <div class="card">
+            <h2>IAC Steps</h2>
+            <p id="iac">--</p>
+        </div>
+
+        <div class="card">
+            <h2>EGR Duty</h2>
+            <p id="egr">-- %</p>
+        </div>
+
+        <div class="card">
+            <h2>BLM</h2>
+            <p id="blm">--</p>
+        </div>
+
+        <div class="card">
+            <h2>BPCLC</h2>
+            <p id="bpclc">--</p>
+        </div>
+
+        <!-- STATUS FLAGS -->
+        <div class="card">
+            <h2>Overdrive</h2>
+            <p id="overdrive">--</p>
+        </div>
+
+        <div class="card">
+            <h2>Shift Light</h2>
+            <p id="shift_light">--</p>
+        </div>
+
+        <div class="card">
+            <h2>High Battery</h2>
+            <p id="high_battery">--</p>
+        </div>
+
+        <div class="card">
+            <h2>ALDL Mode</h2>
+            <p id="aldl_mode">--</p>
+        </div>
+
+        <div class="card">
+            <h2>Diag Position</h2>
+            <p id="diag_position">--</p>
+        </div>
+
+        <!-- SYSTEM INFO -->
+        <div class="card">
+            <h2>PROM ID A</h2>
+            <p id="prom_id_a">--</p>
+        </div>
+
+        <div class="card">
+            <h2>PROM ID B</h2>
+            <p id="prom_id_b">--</p>
+        </div>
+
+        <div class="card">
+            <h2>Airflow (Raw)</h2>
+            <p id="airflow_raw">--</p>
+        </div>
+
+        <div class="card">
+            <h2>Injector BPW</h2>
+            <p id="injector_bpw_raw">--</p>
+        </div>
+
+        <!-- DEBUG -->
+        <div class="card">
+            <h2>Raw Frame</h2>
+            <p id="raw_frame" style="font-size: 12px;">--</p>
+        </div>
+
+    </div>
+
+    <script src="/static/dashboard.js"></script>
+
+</body>
+</html>
