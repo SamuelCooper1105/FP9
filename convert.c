@@ -847,6 +847,7 @@ int main(){
 
 	char read_buf[256];
 	while(1){
+		memset(read_buf, 0, size(read_buf));
 	    int p = 0;
 		while(p < sizeof(read_buf)-1){
 			char c;
@@ -859,9 +860,14 @@ int main(){
 		read_buf[p] = '\0';
 
 		if(p ==0)continue;
+		if(p<74){
+			fprintf(stderr, "short frame (%d chars)\n",p);
+			continue;
+		}
 
-        printf("Line: '%s'\n", read_buf);
-        printf("Length: %d chars\n", p);
+
+        	printf("Line: '%s'\n", read_buf);
+        	printf("Length: %d chars\n", p);
 
 		char one_h[3];
 		one_h[0] = read_buf[0];
